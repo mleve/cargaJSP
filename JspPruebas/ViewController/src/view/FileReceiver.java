@@ -39,7 +39,7 @@ public class FileReceiver extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType(CONTENT_TYPE);
-        
+    
         try {
             List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
             for (FileItem item : items) {
@@ -60,7 +60,7 @@ public class FileReceiver extends HttpServlet {
                     if(fileAux.ready()){
                     BufferedReader bf = new BufferedReader(fileAux);
                     //System.out.println(bf.readLine());
-                    //*/
+                    
                     //System.out.println(fieldname);
                     FileUploader uploader = new FileUploader();
                     Connection con = new DbConnector().getDb("dev","dev","xe");
@@ -72,6 +72,7 @@ public class FileReceiver extends HttpServlet {
             throw new ServletException("Cannot parse multipart request.", e);
         }
         //System.out.println(request);
+ 
         PrintWriter out = response.getWriter();
         out.println("<html>");
         out.println("<head><title>FileReceiver</title></head>");
