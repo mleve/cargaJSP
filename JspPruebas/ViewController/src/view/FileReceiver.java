@@ -4,8 +4,12 @@ package view;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
+import java.sql.Connection;
+
+import view.*;
 import java.util.List;
 
 import javax.servlet.*;
@@ -46,16 +50,22 @@ public class FileReceiver extends HttpServlet {
                     // ... (do your job here)
                 } else {
                     // Process form file field (input type="file").
+                    
                     String fieldname = item.getFieldName();
                     //String filename = FilenameUtils.getName(item.getName());
                     InputStream filecontent = item.getInputStream();
-                    
+                   
                     // ... (do your job here)
-                    /*
-                    BufferedReader bf = new BufferedReader(InputStream);
-                    String line = bf.readLine();
-                    */
-                    System.out.println(fieldname);
+                    InputStreamReader fileAux = new InputStreamReader(filecontent);
+                    if(fileAux.ready()){
+                    BufferedReader bf = new BufferedReader(fileAux);
+                    //System.out.println(bf.readLine());
+                    //*/
+                    //System.out.println(fieldname);
+                    FileUploader uploader = new FileUploader();
+                    Connection con = new DbConnector().getDb("dev","dev","xe");
+                    uploader.uploadFileToDb(bf, con);
+                    }
                 }
             }
         } catch (Exception e) {
