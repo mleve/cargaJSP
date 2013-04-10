@@ -118,6 +118,17 @@
       <value n="j2eeWebAppName" v="JspPruebas-Model-webapp"/>
       <value n="j2eeWebContextRoot" v="JspPruebas-Model-context-root"/>
    </hash>
+   <hash n="oracle.jdeveloper.runner.RunConfigurations">
+      <hash n="runConfigurationDefinitions">
+         <hash n="Default">
+            <value n="custom" v="false"/>
+            <value n="name" v="Default"/>
+         </hash>
+      </hash>
+      <list n="runConfigurationList">
+         <string v="Default"/>
+      </list>
+   </hash>
    <hash n="oracle.jdevimpl.config.JProjectLibraries">
       <list n="exportedReferences">
          <hash>
