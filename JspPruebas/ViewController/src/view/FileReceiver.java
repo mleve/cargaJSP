@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 
 import java.sql.Connection;
 
-import view.*;
 import java.util.List;
 
 import javax.servlet.*;
@@ -63,7 +62,7 @@ public class FileReceiver extends HttpServlet {
                     
                     //System.out.println(fieldname);
                     FileUploader uploader = new FileUploader();
-                    Connection con = new DbConnector().getDb("dev","dev","xe");
+                    Connection con = new DbManager().getDb("dev","dev","xe");
                     uploader.uploadFileToDb(bf, con);
                     }
                 }

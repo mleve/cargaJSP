@@ -11,6 +11,10 @@
     <servlet-name>FileReceiver</servlet-name>
     <servlet-class>view.FileReceiver</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>FileGenerator</servlet-name>
+    <servlet-class>view.FileGenerator</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>Faces Servlet</servlet-name>
     <url-pattern>/faces/*</url-pattern>
@@ -18,5 +22,9 @@
   <servlet-mapping>
     <servlet-name>FileReceiver</servlet-name>
     <url-pattern>/filereceiver</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>FileGenerator</servlet-name>
+    <url-pattern>/filegenerator</url-pattern>
   </servlet-mapping>
 </web-app>
