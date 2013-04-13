@@ -1,3 +1,6 @@
+FileGenerator
+Servlet que , para cada cargo, genera los archivos de input para el modelo.
+
 Carga JSP
 Toma los archivos que se deben subir a la base de datos a traves de 
 una interfaz simple y los agrega a una base de datos siguiendo un patron reconocible.
@@ -8,7 +11,7 @@ DBConector maneja la logica de conexion a una base de datos.
 FileUploader 
 Clase para subir archivos de inputs, en formato .csv y codificacion ANSI a una base de datos.
 Se asume que el formato de los archivos es el siguiente:
-Las filas que empiezan con un # son comentarios y seran ignoradas al momento de la insercion, las primeras 3 filas contienen, comentadas, los datos de la tabla donde guardar la información, el nombre de sus campos, y el tipo de estos,
+Las filas que empiezan con un # son comentarios y seran ignoradas al momento de la insercion, las primeras 3 filas contienen, comentadas, los datos de la tabla donde guardar la informaciï¿½n, el nombre de sus campos, y el tipo de estos,
 se aceptan 3 tipos: STRING, INT, DATE.
  * Ejemplo:
  * #NOMBRE_TABLA
