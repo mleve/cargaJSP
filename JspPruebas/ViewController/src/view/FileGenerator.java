@@ -15,6 +15,10 @@ import java.text.SimpleDateFormat;
 
 import java.util.Calendar;
 
+import java.util.Date;
+
+import java.util.Locale;
+
 import javax.servlet.*;
 import javax.servlet.http.*;
 
@@ -54,6 +58,42 @@ public class FileGenerator extends HttpServlet {
                 String sql = getNextSqlQuery(i,idCargo);
                 //Pedir una tabla en forma de ResultSet
                 table = dbmg.getTable(sql);
+                if(i==7 && table!=null){
+                    //Preproceso de vacaciones
+                    try {
+                        while(table.next()){
+                            Calendar start = Calendar.getInstance();
+                            start.setTime(table.getDate(2));
+
+                            Calendar end = Calendar.getInstance();
+                            end.setTime(table.getDate(3));
+                            SimpleDateFormat sdf = new SimpleDateFormat("EEE",Locale.ENGLISH);
+                            SimpleDateFormat dia = new SimpleDateFormat("dd");
+                            int dayOfWeek,habil;
+                            String dayWeek;
+                            while( !start.after(end)){
+                                Date targetDay = start.getTime();
+                                // Do Work Here
+                                dayWeek=sdf.format(start);
+                                habil= -1;
+                                if(dayWeek.equals("Mon") || dayWeek.equals("Tue") || dayWeek.equals("Wed")
+                                    || dayWeek.equals("Thu") || dayWeek.equals("Fri"))
+                                    habil=1;
+                                else
+                                    habil=0;
+                                String[] nextRow = {table.getString(1),
+                                                    dia.format(start),
+                                                    ""+habil};
+                                writer.writeNext(nextRow);
+                                start.add(Calendar.DATE, 1);
+                            }
+
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    continue;
+                }
                 if(table != null){
                     //Consulta SQL ejecutada con exito
                     try {
@@ -98,8 +138,10 @@ public class FileGenerator extends HttpServlet {
             return "DatosSkills";
         case 6:
             return "Empleados";
-        }
-                   
+        
+        case 7:
+            return "Vacaciones";
+        }           
         return "Cargos";
     }
 
@@ -151,6 +193,10 @@ public class FileGenerator extends HttpServlet {
             "FROM datosEmpleado,datosHistoricos, empleados " + 
             "WHERE empleados.rut = datoshistoricos.empleados_rut AND " + 
             " empleados.cargos_id = '"+cargoId+"' AND datoshistoricos.id_datos =datosempleado.id_datos";
+        case 7:
+            return "SELECT empleados.rut,vacaciones.fechainicio,vacaciones.fechatermino " + 
+            "FROM empleados, vacaciones " + 
+            "WHERE empleados.rut = vacaciones.empleados_rut";
         }
     }
 }
