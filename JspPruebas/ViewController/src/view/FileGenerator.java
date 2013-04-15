@@ -85,15 +85,19 @@ public class FileGenerator extends HttpServlet {
         //Hacer un switch
         switch(i){
         case 0:
-            return "requerimientosSkills";
+            return "RequerimientosSkills";
         case 1:
-            return "turnos";
+            return "Turnos";
         case 2:
-            return "requerimientos";
+            return "Requerimientos";
         case 3:
             return "capacitaciones";
         case 4:
-            return "diasYTurnosProhibidos";
+            return "DiasYTurnosProhibidos";
+        case 5:
+            return "DatosSkills";
+        case 6:
+            return "Empleados";
         }
                    
         return "Cargos";
@@ -103,6 +107,7 @@ public class FileGenerator extends HttpServlet {
         //Hacer un switch
         switch(i){
         case 0:
+            /*
             SimpleDateFormat sp = new SimpleDateFormat("dd/MM/yy");
             String actualDate=sp.format(Calendar.getInstance().getTime());
             Calendar.getInstance().getTime();     
@@ -112,26 +117,40 @@ public class FileGenerator extends HttpServlet {
             return "SELECT skills_id_skill, extract(day from fecha) \"dia\",turnos_idturno, requerimiento FROM demandaskills" +
             " WHERE cargos_id_cargo='"+cargoId+"' AND fecha >= '"+minDate+"' AND fecha <= '"+maxDate+"' " +
             "ORDER BY \"dia\" ASC";
+            */
+            return "SELECT skills_id_skill,extract(day from fecha),turnos_idturno,requerimiento " + 
+            "FROM demandaSkills " + 
+            "WHERE id_cargo='"+cargoId+"'";
         case 1:
             return "SELECT idTurno,nombreTurno FROM turnos";
         case 2:
-            return "SELECT  extract(day from fecha) \"dia\", turnos_idTurno, requerimiento FROM capacity " + 
-            "WHERE cargos_id_cargo='"+cargoId+"' ORDER BY \"dia\" ASC";
+            return "SELECT extract(day from fecha) dia,idturno turno ,requerimiento demanda " + 
+            "FROM capacity " + 
+            "WHERE id_cargo='"+cargoId+"'";
         case 3:
-            return "SELECT capacitaciones.empleados_rut rut,extract(day from fechainicio) dia,turnos.idturno turno " + 
-            " FROM capacitaciones,turnos, empleados " + 
-            "WHERE cast(substr(capacitaciones.horainicio,0 ,2) AS int) >=  " + 
-            "      cast(substr(turnos.horaingreso,0,2) as int) " + 
-            "AND cast(substr(capacitaciones.horatermino,0 ,2) AS int) <=  " + 
-            "    cast(substr(turnos.horasalida,0,2) as int) " + 
-            "AND capacitaciones.empleados_rut = empleados.rut " + 
-            "AND empleados.cargos_id = '"+cargoId+"' ";
+            return "SELECT datoshistoricos.empleados_rut,extract(day from capacitaciones.fecha), " + 
+            " turnos.tipoturno " + 
+            "FROM capacitaciones,datosHistoricos, turnos, empleados " + 
+            "WHERE empleados.cargos_id= datoshistoricos.empleados_rut AND " +  
+            "cast(substr(capacitaciones.horainicio,0 ,2) AS int) >=  cast(substr(turnos.horaingreso,0,2) as int) AND " + 
+            "cast(substr(capacitaciones.horatermino,0 ,2) AS int) <= cast(substr(turnos.horasalida,0,2) as int)";
         case 4:
-            return "SELECT turnosprohibidos.empleados_rut, turnosprohibidos.diainicio, turnosprohibidos.diatermino " + 
-            "FROM turnosprohibidos, empleados " + 
-            "WHERE turnosprohibidos.empleados_rut=empleados.rut AND " + 
-            "empleados.cargos_id='"+cargoId+"' ";
+            return "SELECT datoshistoricos.empleados_rut, extract(day from dia), restriccionasignacion.idturno " + 
+            "FROM restriccionAsignacion, datosHistoricos";
+        case 5:
+            return "SELECT empleados.rut,skills.id_skill " + 
+            "FROM empleados, empleadosxSkill, skills " + 
+            "WHERE empleados.cargos_id='"+cargoId+"' AND empleadosxskill.empleados_rut=empleados.rut " + 
+            " AND skills.id_skill=skills.id_skill";
+        case 6:
+            return "SELECT datoshistoricos.empleados_rut,datosempleado.diastrabajados,datosempleado.diasdescansados " + 
+            ",datosempleado.maxnoches,datosempleado.librespostsaliente,datosempleado.finesdesemanalibres, " + 
+            " datosempleado.libresseguidos,datosempleado.promedioa,datosempleado.mina,datosempleado.maxa, " + 
+            " datosempleado.promediot,datosempleado.mint,datosempleado.maxt,datosempleado.promedion, " + 
+            " datosempleado.minn, datosempleado.maxn, datosempleado.maxquiebres,datosempleado.domingoslibres " + 
+            "FROM datosEmpleado,datosHistoricos, empleados " + 
+            "WHERE empleados.rut = datoshistoricos.empleados_rut AND " + 
+            " empleados.cargos_id = '"+cargoId+"' AND datoshistoricos.id_datos =datosempleado.id_datos";
         }
-        return "SELECT * FROM CARGOS";
     }
 }
