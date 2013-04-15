@@ -198,5 +198,6 @@ public class FileGenerator extends HttpServlet {
             "FROM empleados, vacaciones " + 
             "WHERE empleados.rut = vacaciones.empleados_rut";
         }
+        return "lol";
     }
 }

@@ -158,8 +158,14 @@ public class FileUploader {
                     separator = new StringTokenizer(actualLine,";");
                     dataRow = new String[columns];
                     for(int i=0;i<columns;i++){
+                        try{
                             dataRow[i] = separator.nextToken();
                             //System.out.print(dataRow[i]+"\t");
+                        } 
+                        catch(Exception e){
+                            //NoSuchElementException => dato vacio
+                            dataRow[i] = "";    
+                        }
                     }
                     //System.out.println("");
                     
