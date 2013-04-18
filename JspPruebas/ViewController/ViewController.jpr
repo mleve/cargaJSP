@@ -182,7 +182,15 @@
             <value n="isJDK" v="false"/>
          </hash>
          <hash>
+<<<<<<< HEAD
+            <value n="id" v="Opencsv-2.3.jar"/>
+            <value n="isJDK" v="false"/>
+         </hash>
+         <hash>
+            <value n="id" v="Commons-fileupload-1.3-javadoc.jar"/>
+=======
             <value n="id" v="Commons-fileupload-1.3.jar1"/>
+>>>>>>> 93d96eeeed4e48fe8869432369d094d97eba7b2a
             <value n="isJDK" v="false"/>
          </hash>
          <hash>
@@ -194,16 +202,28 @@
          <list n="libraryDefinitions">
             <hash>
                <list n="classPath">
+<<<<<<< HEAD
+                  <url path="public_html/WEB-INF/lib/opencsv-2.3.jar" jar-entry=""/>
+               </list>
+               <value n="deployedByDefault" v="true"/>
+               <value n="description" v="Opencsv-2.3.jar"/>
+               <value n="id" v="Opencsv-2.3.jar"/>
+=======
                   <url path="public_html/WEB-INF/lib/commons-fileupload-1.3-javadoc.jar" jar-entry=""/>
                </list>
                <value n="deployedByDefault" v="true"/>
                <value n="description" v="Commons-fileupload-1.3-javadoc.jar1"/>
                <value n="id" v="Commons-fileupload-1.3-javadoc.jar1"/>
+>>>>>>> 93d96eeeed4e48fe8869432369d094d97eba7b2a
                <value n="locked" v="true"/>
             </hash>
             <hash>
                <list n="classPath">
+<<<<<<< HEAD
+                  <url path="public_html/WEB-INF/lib/commons-fileupload-1.3-javadoc.jar" jar-entry=""/>
+=======
                   <url path="public_html/WEB-INF/lib/commons-fileupload-1.3.jar" jar-entry=""/>
+>>>>>>> 93d96eeeed4e48fe8869432369d094d97eba7b2a
                </list>
                <value n="deployedByDefault" v="true"/>
                <value n="description" v="Commons-fileupload-1.3.jar1"/>
@@ -212,7 +232,11 @@
             </hash>
             <hash>
                <list n="classPath">
+<<<<<<< HEAD
+                  <url path="public_html/WEB-INF/lib/commons-fileupload-1.3.jar" jar-entry=""/>
+=======
                   <url path="public_html/WEB-INF/lib/javax.faces-2.0.10.jar" jar-entry=""/>
+>>>>>>> 93d96eeeed4e48fe8869432369d094d97eba7b2a
                </list>
                <value n="deployedByDefault" v="true"/>
                <value n="description" v="Javax.faces-2.0.10.jar"/>
@@ -248,7 +272,15 @@
             <value n="isJDK" v="false"/>
          </hash>
          <hash>
+<<<<<<< HEAD
+            <value n="id" v="Opencsv-2.3.jar"/>
+            <value n="isJDK" v="false"/>
+         </hash>
+         <hash>
+            <value n="id" v="Commons-fileupload-1.3-javadoc.jar"/>
+=======
             <value n="id" v="Commons-fileupload-1.3.jar1"/>
+>>>>>>> 93d96eeeed4e48fe8869432369d094d97eba7b2a
             <value n="isJDK" v="false"/>
          </hash>
          <hash>

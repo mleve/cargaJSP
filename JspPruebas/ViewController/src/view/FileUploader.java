@@ -158,8 +158,14 @@ public class FileUploader {
                     separator = new StringTokenizer(actualLine,";");
                     dataRow = new String[columns];
                     for(int i=0;i<columns;i++){
+                        try{
                             dataRow[i] = separator.nextToken();
                             //System.out.print(dataRow[i]+"\t");
+                        } 
+                        catch(Exception e){
+                            //NoSuchElementException => dato vacio
+                            dataRow[i] = "";    
+                        }
                     }
                     //System.out.println("");
                     
@@ -228,8 +234,9 @@ public class FileUploader {
 				if(colTypes[i].equals("int"))
 					SQL.setInt(i+1, Integer.parseInt(dataRow[i]));
 				else if(colTypes[i].equals("date")){
-					SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-					java.sql.Date sqlDate = new java.sql.Date(formatter.parse(dataRow[i]).getTime());
+					SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                                        java.util.Date aux=formatter.parse(dataRow[i]);
+					java.sql.Date sqlDate = new java.sql.Date(aux.getTime());
 					SQL.setDate(i+1, sqlDate);
 				}
                                 else{
