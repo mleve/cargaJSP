@@ -51,7 +51,7 @@ public class FileGenerator extends HttpServlet {
             /*Aqui, en una ciclo o algo, se debe iterar para crear los
              * 12 archivos necesarios:
              * */
-            for(int i =0; i<=3;i++){
+            for(int i =0; i<=7;i++){
                 String fileName = getNextFileName(i);
                 ResultSet table = null;
                 CSVWriter writer = new CSVWriter(new FileWriter(folderName+"\\"+fileName+".csv"),';',' ');
@@ -94,6 +94,27 @@ public class FileGenerator extends HttpServlet {
                     }
                     continue;
                 }
+                else if(table!=null && i==2){
+                    //Ajustar al dia de inicio y grabar
+                    int rowDay;
+                    try {
+                        while(table.next()){
+                        rowDay = table.getInt(1);
+                        rowDay=rowDay+9;
+                        String[] nextRow = {""+rowDay,
+                                            table.getString(2),
+                                            table.getString(3)};
+                        writer.writeNext(nextRow);
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    //Si no se alcanzan los 42 dias, copiar ...algo
+                    if(rowDay<42){
+                        table=dbmg.getTable(sql);
+                        
+                        }
+                    }
                 if(table != null){
                     //Consulta SQL ejecutada con exito
                     try {
@@ -166,9 +187,10 @@ public class FileGenerator extends HttpServlet {
         case 1:
             return "SELECT idTurno,nombreTurno FROM turnos";
         case 2:
-            return "SELECT extract(day from fecha) dia,idturno turno ,requerimiento demanda " + 
-            "FROM capacity " + 
-            "WHERE id_cargo='"+cargoId+"'";
+            return "SELECT extract(day from fecha) dia, idturno turno ,requerimiento demanda "+
+            "FROM capacity "+
+            "WHERE idcargo='"+cargoId+"' "+
+            "ORDER BY dia ASC, turno ASC ";
         case 3:
             return "SELECT datoshistoricos.empleados_rut,extract(day from capacitaciones.fecha), " + 
             " turnos.tipoturno " + 
