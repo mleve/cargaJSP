@@ -127,6 +127,9 @@
             <input type="submit" onclick="showBusy()" value="enviar"/>
         </form>
         </div>
+        <p>
+            <a href="menu.html">Volver</a>
+        </p>
         <div id="busyContainer" >
             <img src="busy2.gif" />
         </div>
