@@ -5,6 +5,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=windows-1252"/>
         <title>holaMundo</title>
         <script language="JavaScript" src="resources/js/jquery-1.9.1.min.js"></script>
+        <!-- styles y jquery de checkboxs -->
+        <link rel="stylesheet" href="resources/css/ezmark.css" media="all">
+        <script type="text/javascript" language="Javascript" src="resources/js/jquery.ezmark.min.js"></script>
+        <!-- -->
         <style type="text/css">
             #busyContainer{
                 display:none;
@@ -13,6 +17,32 @@
                 left:100px;
             }        
         </style>
+        <script type="text/javascript">
+        $(function() {
+                $('input[type="checkbox"]').ezMark(); 
+                
+                // check all functionality
+                $('#checkAllBtn').click(function(e) {
+                        $('input[name^="item"]').each(function() {
+                                $(this).attr({"checked":"checked"});
+                                $(this).trigger('change');
+                        });
+                        return false;
+                });
+        
+        
+                // uncheck all functionality
+                $('#uncheckAllBtn').click(function(e) {
+                        $('input[name^="item"]').each(function() {
+                                $(this).removeAttr('checked');
+                                $(this).trigger('change');
+                        });
+                        return false;
+                });
+                
+        });	
+</script>
+        
     </head>
     <body>
         <div id="cargaFormDiv">
@@ -30,6 +60,8 @@
             <input type="checkbox" name="vehicle" value="#divDemandaHora">demandaHora.csv</br>
             <input type="checkbox" name="vehicle" value="#divDemandaSkills">demandaSkills.csv</br>
         </div>
+        
+       
         <h1>Ingreso de Archivos </h1>
         <form method="POST" enctype="multipart/form-data" action="filereceiver">
             <div id="divEmpl" style="display:none">
