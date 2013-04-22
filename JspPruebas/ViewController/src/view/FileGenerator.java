@@ -215,15 +215,17 @@ public class FileGenerator extends HttpServlet {
             "WHERE idcargo='"+cargoId+"' "+
             "ORDER BY dia ASC, turno ASC ";
         case 3:
-            return "SELECT datoshistoricos.rut,extract(day from capacitaciones.fecha), " + 
-            " turnos.tipoturno " + 
-            "FROM capacitaciones,datosHistoricos, turnos, empleados " + 
-            "WHERE empleados.cargos_id= datoshistoricos.empleados_rut AND " +  
-            "cast(substr(capacitaciones.horainicio,0 ,2) AS int) >=  cast(substr(turnos.horaingreso,0,2) as int) AND " + 
+            return "SELECT empleados.rut,capacitaciones.fechaInicio,capacitaciones.fechatermino, turnos.tipoturno " + 
+            "FROM capacitaciones,turnos, empleados " + 
+            "WHERE capacitaciones.rut = empleados.rut AND empleados.idCargo = '"+cargoId+"' AND   " + 
+            "cast(substr(capacitaciones.horainicio,0 ,2) AS int) >=  cast(substr(turnos.horaingreso,0,2) as int) AND  " + 
             "cast(substr(capacitaciones.horatermino,0 ,2) AS int) <= cast(substr(turnos.horasalida,0,2) as int)";
         case 4:
-            return "SELECT datoshistoricos.rut, extract(day from dia), restriccionasignacion.idturno " + 
-            "FROM restriccionAsignacion, datosHistoricos";
+            return "SELECT datoshistoricos.rut, extract(day from dia), restriccionasignacion.idturno  " + 
+            "FROM restriccionAsignacion, datosHistoricos,empleados " + 
+            "WHERE empleados.rut = datoshistoricos.rut AND empleados.idCargo = '"+cargoId+"' AND " + 
+            "datoshistoricos.idProhibido = restriccionasignacion.idProhibido AND " + 
+            "restriccionAsignacion.idProhibido != 0";
         case 5:
             return "SELECT empleados.rut,skills.idskill " + 
             "FROM empleados, empleadosxSkill, skills " + 
@@ -237,8 +239,9 @@ public class FileGenerator extends HttpServlet {
             " empleados.idcargo = '"+cargoId+"' AND datoshistoricos.iddatos =datosempleado.iddatos";
         case 7:
             return "SELECT empleados.rut,vacaciones.fechainicio,vacaciones.fechatermino " + 
-            "FROM empleados, vacaciones " + 
-            "WHERE empleados.rut = vacaciones.empleados_rut";
+            "FROM empleados, vacaciones  " + 
+            "WHERE empleados.rut = vacaciones.rut AND  " + 
+            "empleados.idCargo='"+cargoId+"'";
         }
         return "lol";
     }
