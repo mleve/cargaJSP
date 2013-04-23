@@ -88,7 +88,7 @@
     <body>
     <div class="container">
       <header>
-        <a href="#"><img src="resources/images/header.jpg" alt="Insertar logotipo aquí" width="900" height="90" id="Insert_logo" style="background: #42413C;; display:block;" /></a>
+        <a href="menu.html"><img src="resources/images/header.jpg" alt="Andes Airport" width="900" height="90" id="logo" style="background: #42413C;; display:block;" /></a>
       </header>
       
       <div  align="center" class="div_header" >
@@ -151,6 +151,28 @@
                 </select>
             </li>
         </ul>
+        
+        <ul>
+            <li>
+                <label for="mes">Mes: </label>
+                <select id="mes">
+                  <option value="04">Abril</option>
+                  <option value="05">Mayo</option>
+                  <option value="06">Junio</option>
+                  <option value="07">Julio</option>
+                </select>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <label for="anno">A&ntilde;o: </label>
+                <select id="anno">
+                  <option value="2012">2012</option>
+                  <option value="2013">2013</option>
+                </select>
+            </li>
+        </ul>
+        
         
         <ul>
 		<li><a href="menu.html" class="dropdown">Volver</a></li>		
