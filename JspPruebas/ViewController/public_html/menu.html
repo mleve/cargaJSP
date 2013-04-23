@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Menu Inicial</title>
+
+<link href="resources/css/styles.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="resources/js/jquery-1.9.1.min.js"></script>
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<script type="text/javascript">
+
+$(function(){
+	$('.dropdown').mouseenter(function(){
+		$('.sublinks').stop(false, true).hide();
+	
+		var submenu = $(this).parent().next();
+
+		submenu.css({
+			position:'absolute',
+			top: $(this).offset().top + $(this).height() + 'px',
+			left: $(this).offset().left + 'px',
+			zIndex:1000
+		});
+		
+		submenu.stop().slideDown(300);
+		
+		submenu.mouseleave(function(){
+			$(this).slideUp(300);
+		});
+	});
+});
+</script>
+
+</head>
+
+<body>
+
+<div class="container">
+  <header>
+    <a href="menu.html"><img src="resources/images/header.jpg" alt="Andes Airport" width="900" height="90" id="logo" style="background: #42413C;; display:block;" /></a>
+  </header>
+
+    <div  align="center" class="div_header" >
+	<ul>
+            <li>
+                <label for="mes">Mes: </label>
+                <select id="mes">
+                  <option value="04">Abril</option>
+                  <option value="05">Mayo</option>
+                  <option value="06">Junio</option>
+                  <option value="07">Julio</option>
+                </select>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <label for="anno">A&ntilde;o: </label>
+                <select id="anno">
+                  <option value="2012">2012</option>
+                  <option value="2013">2013</option>
+                </select>
+            </li>
+        </ul>
+	<!-- First Menu Start -->
+	<ul>
+		<li><a href="#" class="dropdown">Generar Roster</a></li>
+		
+		<li class="sublinks">
+			<a href="">Generar Roster</a>
+			<a href="">Edici&oacute;n de Roster</a>
+		</li>
+		
+	</ul>
+	<!-- First Menu End -->
+
+	<!-- Second Menu Start -->
+	<ul>
+		<li><a href="#" class="dropdown">Datos</a></li>
+		
+		<li class="sublinks">
+			<a href="CargaArchivos.jsp">Importar Archivos</a>
+                        <a href="">Edici&oacute;n Datos</a>
+		</li>
+		
+	</ul>
+	<!-- Second Menu End -->
+
+	<!-- Third Menu Start -->
+	
+	<ul>
+		<li><a href="" class="dropdown">Exportar</a>
+                    <li class="sublinks">
+                        <a href="generador.jsp">Archivos por cargo</a>
+                    </li>
+                </li>
+		<!--
+		<li class="sublinks">
+			<a href="#">Link 1</a>
+			<a href="#">Link 2</a>
+			<a href="#">Link 3</a>
+			<a href="#">Link 4</a>
+			<a href="#">Link 5</a>
+		</li>
+		-->
+	</ul>
+	
+	
+	<!-- Third Menu End -->
+
+	<!-- Fourth Menu Start -->
+	<ul>
+		<li></li>
+		
+		<li class="sublinks">
+			<a href="#">Link 1</a>
+			<a href="#">Link 2</a>
+			<a href="#">Link 3</a>
+			<a href="#">Link 4</a>
+			<a href="#">Link 5</a>
+		</li>
+		
+	</ul>
+	<!-- Fourth Menu End -->
+
+	<!-- Fifth Menu Start -->
+	<ul>
+		<li></li>
+		
+		<li class="sublinks">
+			<a href="#">Link 1</a>
+			<a href="#">Link 2</a>
+			<a href="#">Link 3</a>
+			<a href="#">Link 4</a>
+			<a href="#">Link 5</a>
+		</li>
+		
+	</ul>
+	<!-- Fifth Menu End -->
+	
+  
+	<!-- Back to iShift link -->
+	</div>
+  <br clear="all"/>
+
+  
+  
+  
+  <article class="content">
+    <h1>Sistema Rostering Andes</h1>
+    <section>
+     <h2><img src="resources/images/placeholder.png" width="584" height="205" alt="Bienvenido"></h2>
+</section>
+    <!-- end .content --></article>
+  <footer>
+    <p>sistema rostering andes v1.0</p>
+</footer>
+  <!-- end .container --></div>
+</body>
+</html>

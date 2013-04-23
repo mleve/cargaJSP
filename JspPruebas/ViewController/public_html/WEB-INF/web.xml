@@ -27,4 +27,7 @@
     <servlet-name>FileGenerator</servlet-name>
     <url-pattern>/filegenerator</url-pattern>
   </servlet-mapping>
+  <welcome-file-list>
+    <welcome-file>/main.html</welcome-file>
+  </welcome-file-list>
 </web-app>
