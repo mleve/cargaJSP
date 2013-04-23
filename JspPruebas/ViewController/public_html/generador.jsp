@@ -2,8 +2,9 @@
 <%@ page contentType="text/html;charset=windows-1252"%>
 <html>
     <head>
+    <title>Exportar Cargo</title>
         <meta http-equiv="Content-Type" content="text/html; charset=windows-1252"/>
-        <script type="text/javascript" src="javascript/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript" src="resources/js/jquery-1.9.1.min.js"></script>
     </head>
     <body>
         <label for="nombreCargo">Ingrese el cargo:</label>
