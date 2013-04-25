@@ -8,11 +8,8 @@
         <link rel="stylesheet" href="resources/css/ezmark.css" media="all">
         <link href="resources/css/styles.css" rel="stylesheet" type="text/css">
         <script language="JavaScript" src="resources/js/jquery-1.9.1.min.js"></script>
-
-        <!-- styles y jquery de checkboxs -->
-        
         <script type="text/javascript" language="Javascript" src="resources/js/jquery.ezmark.min.js"></script>
-        <!-- -->
+        
         <style type="text/css">
             #busyContainer{
                 display:none;
@@ -180,7 +177,7 @@
       
       <article class="content">
             <div id="cargaFormDiv">
-            <h1>Seleccione que archivos subira </h1>
+            <h1>Seleccione archivos a subir </h1>
             <div id="checkBoxesDiv" class="divContainer">
                 <input type="checkbox" name="vehicle" value="#divEmpl">empleados.csv<br>
                 <input type="checkbox" name="vehicle" value="#divCargos">cargos.csv</br> 
