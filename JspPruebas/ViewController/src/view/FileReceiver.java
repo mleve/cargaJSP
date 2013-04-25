@@ -62,7 +62,7 @@ public class FileReceiver extends HttpServlet {
                     
                     //System.out.println(fieldname);
                     FileUploader uploader = new FileUploader();
-                    Connection con = new DbManager().getDb("dev","dev","xe");
+                    Connection con = new DbManager().getDb("dev","dev","orcl");
                     uploader.uploadFileToDb(bf, con);
                     }
                 }

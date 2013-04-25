@@ -170,8 +170,10 @@ public class FileUploader {
                         }
                     }
                     //System.out.println("");
-                    
+                    //MAXIMO 1 CURSOR!!???
+                    //PreparedStatement SQL = prepareSQL(con,colNames,tableName);
                     saveRecord(SQL,colTypes,dataRow);
+                    //SQL.close();
                     if(tableName.equals("Empleados"))
                         createHistoricRecord(dataRow,con);
                         
@@ -252,7 +254,8 @@ public class FileUploader {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
+
 	}
 
     private void createHistoricRecord(String[] empData, Connection con) {
@@ -272,7 +275,8 @@ public class FileUploader {
             calendar.setTime(today);  
             calendar.set(Calendar.DAY_OF_MONTH, 1);  
             java.util.Date firstDayOfMonth = calendar.getTime();  
-            st.setDate(5, new Date(firstDayOfMonth.getTime()));
+            Date aDate = new Date(firstDayOfMonth.getTime());
+            st.setDate(5, aDate);
             st.setInt(6, 1);
             
             st.executeUpdate();

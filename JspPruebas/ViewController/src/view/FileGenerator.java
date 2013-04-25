@@ -46,99 +46,35 @@ public class FileGenerator extends HttpServlet {
             String folderName="C:\\"+idCargo;
             new File(folderName).mkdir();
             //Carga de clases auxiliares:
-            DbManager dbmg = new DbManager("dev","dev","xe");
+            DbManager dbmg = new DbManager("dev","dev","orcl");
             
             /*Aqui, en una ciclo o algo, se debe iterar para crear los
              * 12 archivos necesarios:
              * */
-            for(int i =5; i<=6;i++){
+            for(int i =2; i<=7;i++){
                 String fileName = getNextFileName(i);
                 ResultSet table = null;
                 CSVWriter writer = new CSVWriter(new FileWriter(folderName+"\\"+fileName+".csv"),';',' ');
                 String sql = getNextSqlQuery(i,idCargo);
                 //Pedir una tabla en forma de ResultSet
                 table = dbmg.getTable(sql);
-                if(i==7 && table!=null){
-                    //Preproceso de vacaciones
-                    try {
-                        while(table.next()){
-                            Calendar start = Calendar.getInstance();
-                            start.setTime(table.getDate(2));
-
-                            Calendar end = Calendar.getInstance();
-                            end.setTime(table.getDate(3));
-                            SimpleDateFormat sdf = new SimpleDateFormat("EEE",Locale.ENGLISH);
-                            SimpleDateFormat dia = new SimpleDateFormat("dd");
-                            int dayOfWeek,habil;
-                            String dayWeek;
-                            while( !start.after(end)){
-                                Date targetDay = start.getTime();
-                                // Do Work Here
-                                dayWeek=sdf.format(start);
-                                habil= -1;
-                                if(dayWeek.equals("Mon") || dayWeek.equals("Tue") || dayWeek.equals("Wed")
-                                    || dayWeek.equals("Thu") || dayWeek.equals("Fri"))
-                                    habil=1;
-                                else
-                                    habil=0;
-                                String[] nextRow = {table.getString(1),
-                                                    dia.format(start),
-                                                    ""+habil};
-                                writer.writeNext(nextRow);
-                                start.add(Calendar.DATE, 1);
-                            }
-
-                        }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+                if(i==2){
+                    postProcess(table,writer,dbmg,sql);
                     continue;
                 }
-                else if(table!=null && i==2){
-                    //Ajustar al dia de inicio y grabar
-                    int rowDay =-1;
-                    try {
-                        while(table.next()){
-                        rowDay = table.getInt(1);
-                        rowDay=rowDay+9;
-                        String[] nextRow = {""+rowDay,
-                                            ""+table.getInt(2),
-                                            ""+table.getInt(3)};
-                        writer.writeNext(nextRow);
-                        }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    //Si no se alcanzan los 42 dias, copiar ...algo
-                    if(rowDay<42){
-                        //Recupero la misma tabla anterior
-                        table=dbmg.getTable(sql);
-                        try{
-                            table.next();
-                            //Avanzo al dia desde el que voy a empezar a repetir
-                            while(table.getInt(1)<(rowDay-(7+9)))
-                                table.next();
-                            //Repito datos hasta completar los 42 dias
-                            for(int k=rowDay;k<=42;k++){
-                                int normalDay=k-(7+9);
-                                while(normalDay==table.getInt(1)){
-                                    String[] nextRow ={""+k,
-                                                   table.getString(2),
-                                                   table.getString(3)};
-                                    writer.writeNext(nextRow);
-                                    table.next();
-                                    }
-                                }
-                            writer.close();
-                            table.close();
-                        }
-                        catch(Exception e){
-                            e.printStackTrace();;
-                            }
-
-                        }
-                    }
-                else if(table != null){
+                else if(i==3){
+                    postProcess3(table,writer);
+                    continue;
+                }
+                else if(i==6){
+                    postProcess6(table,writer);
+                    continue;
+                }
+                else if(i==7){
+                    postProcess7(table,writer);
+                    continue;
+                }
+                else{
                     //Consulta SQL ejecutada con exito
                     try {
                         writer.writeAll(table, true);
@@ -150,20 +86,12 @@ public class FileGenerator extends HttpServlet {
                     try {
                         table.close();
                     } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
+                        e.printStackTrace();                   
+                    }        
+
             }
         }
-        /*
-        out.println("<html>");
-        out.println("<head><title>FileGenerator</title></head>");
-        out.println("<body>");
-        out.println("<p>The servlet has received a GET. This is the reply.</p>");
-        out.println("</body></html>");
-        out.close();
-
-        */
+    }
     }
 
     private String getNextFileName(int i) {
@@ -244,5 +172,138 @@ public class FileGenerator extends HttpServlet {
             "empleados.idCargo='"+cargoId+"'";
         }
         return "lol";
+    }
+
+    private void postProcess(ResultSet table, CSVWriter writer, DbManager dbmg,String sql ) {
+        //Ajustar al dia de inicio y grabar
+        int rowDay =-1;
+        try {
+            while(table.next()){
+            rowDay = table.getInt(1);
+            rowDay=rowDay+9;
+            String[] nextRow = {""+rowDay,
+                                ""+table.getInt(2),
+                                ""+table.getInt(3)};
+            writer.writeNext(nextRow);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //Si no se alcanzan los 42 dias, copiar ...algo
+        if(rowDay<42){
+            //Recupero la misma tabla anterior
+            table=dbmg.getTable(sql);
+            try{
+                table.next();
+                //Avanzo al dia desde el que voy a empezar a repetir
+                while(table.getInt(1)<(rowDay-(7+9)))
+                    table.next();
+                //Repito datos hasta completar los 42 dias
+                for(int k=rowDay;k<=42;k++){
+                    int normalDay=k-(7+9);
+                    while(normalDay==table.getInt(1)){
+                        String[] nextRow ={""+k,
+                                       table.getString(2),
+                                       table.getString(3)};
+                        writer.writeNext(nextRow);
+                        table.next();
+                        }
+                    }
+                writer.close();
+                table.close();
+            }
+            catch(Exception e){
+                e.printStackTrace();;
+                }
+
+            }
+        
+    }
+
+    private void postProcess7(ResultSet table, CSVWriter writer) {
+        //Preproceso de vacaciones
+        try {
+            while(table.next()){
+                Calendar start = Calendar.getInstance();
+                start.setTime(table.getDate(2));
+
+                Calendar end = Calendar.getInstance();
+                end.setTime(table.getDate(3));
+                SimpleDateFormat sdf = new SimpleDateFormat("EEE",Locale.ENGLISH);
+                SimpleDateFormat dia = new SimpleDateFormat("dd");
+                int dayOfWeek,habil;
+                String dayWeek;
+                while( !start.after(end)){
+                    Date targetDay = start.getTime();
+                    // Do Work Here
+                    dayWeek=sdf.format(start.getTime());
+                    habil= -1;
+                    if(dayWeek.equals("Mon") || dayWeek.equals("Tue") || dayWeek.equals("Wed")
+                        || dayWeek.equals("Thu") || dayWeek.equals("Fri"))
+                        habil=1;
+                    else
+                        habil=0;
+                    String[] nextRow = {table.getString(1),
+                                        dia.format(start.getTime()),
+                                        ""+habil};
+                    writer.writeNext(nextRow);
+                    start.add(Calendar.DATE, 1);
+                }
+            writer.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+ 
+    }
+
+    private void postProcess3(ResultSet table, CSVWriter writer) {
+        //Preproceso de vacaciones
+        try {
+            while(table.next()){
+                Calendar start = Calendar.getInstance();
+                start.setTime(table.getDate(2));
+
+                Calendar end = Calendar.getInstance();
+                end.setTime(table.getDate(3));
+                //SimpleDateFormat sdf = new SimpleDateFormat("EEE",Locale.ENGLISH);
+                SimpleDateFormat dia = new SimpleDateFormat("dd");
+                int dayOfWeek,habil;
+                String dayWeek;
+                while( !start.after(end)){
+                    Date targetDay = start.getTime();
+                    // Do Work Here
+                    String[] nextRow = {table.getString(1),
+                                        dia.format(start.getTime()),
+                                        table.getString(4)};
+                    writer.writeNext(nextRow);
+                    start.add(Calendar.DATE, 1);
+                }
+
+            }
+        writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void postProcess6(ResultSet table, CSVWriter writer) {
+        try {
+            while(table.next()){
+                    String[] nextRow = {table.getString(1),
+                                        table.getString(2),
+                                        table.getString(3),
+                                        table.getString(4),
+                                        table.getString(5),
+                                        table.getString(6),
+                                        "0","0","0","0","0","0",
+                                        "0","0","0","0","0","0"};
+                    writer.writeNext(nextRow);    
+        }
+        writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
