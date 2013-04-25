@@ -51,7 +51,7 @@ public class FileGenerator extends HttpServlet {
             /*Aqui, en una ciclo o algo, se debe iterar para crear los
              * 12 archivos necesarios:
              * */
-            for(int i =0; i<=7;i++){
+            for(int i =5; i<=6;i++){
                 String fileName = getNextFileName(i);
                 ResultSet table = null;
                 CSVWriter writer = new CSVWriter(new FileWriter(folderName+"\\"+fileName+".csv"),';',' ');
@@ -96,14 +96,14 @@ public class FileGenerator extends HttpServlet {
                 }
                 else if(table!=null && i==2){
                     //Ajustar al dia de inicio y grabar
-                    int rowDay;
+                    int rowDay =-1;
                     try {
                         while(table.next()){
                         rowDay = table.getInt(1);
                         rowDay=rowDay+9;
                         String[] nextRow = {""+rowDay,
-                                            table.getString(2),
-                                            table.getString(3)};
+                                            ""+table.getInt(2),
+                                            ""+table.getInt(3)};
                         writer.writeNext(nextRow);
                         }
                     } catch (SQLException e) {
@@ -111,16 +111,40 @@ public class FileGenerator extends HttpServlet {
                     }
                     //Si no se alcanzan los 42 dias, copiar ...algo
                     if(rowDay<42){
+                        //Recupero la misma tabla anterior
                         table=dbmg.getTable(sql);
-                        
+                        try{
+                            table.next();
+                            //Avanzo al dia desde el que voy a empezar a repetir
+                            while(table.getInt(1)<(rowDay-(7+9)))
+                                table.next();
+                            //Repito datos hasta completar los 42 dias
+                            for(int k=rowDay;k<=42;k++){
+                                int normalDay=k-(7+9);
+                                while(normalDay==table.getInt(1)){
+                                    String[] nextRow ={""+k,
+                                                   table.getString(2),
+                                                   table.getString(3)};
+                                    writer.writeNext(nextRow);
+                                    table.next();
+                                    }
+                                }
+                            writer.close();
+                            table.close();
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();;
+                            }
+
                         }
                     }
-                if(table != null){
+                else if(table != null){
                     //Consulta SQL ejecutada con exito
                     try {
                         writer.writeAll(table, true);
                     } catch (SQLException e) {
                         System.out.println("Algo malo paso al tratar de guardar datos en archivo");
+                        e.printStackTrace();
                     }
                     writer.close();
                     try {
@@ -159,7 +183,6 @@ public class FileGenerator extends HttpServlet {
             return "DatosSkills";
         case 6:
             return "Empleados";
-        
         case 7:
             return "Vacaciones";
         }           
@@ -178,12 +201,12 @@ public class FileGenerator extends HttpServlet {
             int maxDay = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
             String maxDate=""+maxDay+actualDate.substring(2);
             return "SELECT skills_id_skill, extract(day from fecha) \"dia\",turnos_idturno, requerimiento FROM demandaskills" +
-            " WHERE cargos_id_cargo='"+cargoId+"' AND fecha >= '"+minDate+"' AND fecha <= '"+maxDate+"' " +
+            " WHERE cargos_='"+cargoId+"' AND fecha >= '"+minDate+"' AND fecha <= '"+maxDate+"' " +
             "ORDER BY \"dia\" ASC";
             */
-            return "SELECT skills_id_skill,extract(day from fecha),turnos_idturno,requerimiento " + 
+            return "SELECT idskill,extract(day from fecha),idturno,requerimiento " + 
             "FROM demandaSkills " + 
-            "WHERE id_cargo='"+cargoId+"'";
+            "WHERE idcargo='"+cargoId+"'";
         case 1:
             return "SELECT idTurno,nombreTurno FROM turnos";
         case 2:
@@ -192,33 +215,33 @@ public class FileGenerator extends HttpServlet {
             "WHERE idcargo='"+cargoId+"' "+
             "ORDER BY dia ASC, turno ASC ";
         case 3:
-            return "SELECT datoshistoricos.empleados_rut,extract(day from capacitaciones.fecha), " + 
-            " turnos.tipoturno " + 
-            "FROM capacitaciones,datosHistoricos, turnos, empleados " + 
-            "WHERE empleados.cargos_id= datoshistoricos.empleados_rut AND " +  
-            "cast(substr(capacitaciones.horainicio,0 ,2) AS int) >=  cast(substr(turnos.horaingreso,0,2) as int) AND " + 
+            return "SELECT empleados.rut,capacitaciones.fechaInicio,capacitaciones.fechatermino, turnos.tipoturno " + 
+            "FROM capacitaciones,turnos, empleados " + 
+            "WHERE capacitaciones.rut = empleados.rut AND empleados.idCargo = '"+cargoId+"' AND   " + 
+            "cast(substr(capacitaciones.horainicio,0 ,2) AS int) >=  cast(substr(turnos.horaingreso,0,2) as int) AND  " + 
             "cast(substr(capacitaciones.horatermino,0 ,2) AS int) <= cast(substr(turnos.horasalida,0,2) as int)";
         case 4:
-            return "SELECT datoshistoricos.empleados_rut, extract(day from dia), restriccionasignacion.idturno " + 
-            "FROM restriccionAsignacion, datosHistoricos";
+            return "SELECT datoshistoricos.rut, extract(day from dia), restriccionasignacion.idturno  " + 
+            "FROM restriccionAsignacion, datosHistoricos,empleados " + 
+            "WHERE empleados.rut = datoshistoricos.rut AND empleados.idCargo = '"+cargoId+"' AND " + 
+            "datoshistoricos.idProhibido = restriccionasignacion.idProhibido AND " + 
+            "restriccionAsignacion.idProhibido != 0";
         case 5:
-            return "SELECT empleados.rut,skills.id_skill " + 
+            return "SELECT empleados.rut,skills.idskill " + 
             "FROM empleados, empleadosxSkill, skills " + 
-            "WHERE empleados.cargos_id='"+cargoId+"' AND empleadosxskill.empleados_rut=empleados.rut " + 
-            " AND skills.id_skill=skills.id_skill";
+            "WHERE empleados.idcargo='"+cargoId+"' AND empleadosxskill.rut=empleados.rut " + 
+            " AND skills.idskill=empleadosxskill.idskill";
         case 6:
-            return "SELECT datoshistoricos.empleados_rut,datosempleado.diastrabajados,datosempleado.diasdescansados " + 
-            ",datosempleado.maxnoches,datosempleado.librespostsaliente,datosempleado.finesdesemanalibres, " + 
-            " datosempleado.libresseguidos,datosempleado.promedioa,datosempleado.mina,datosempleado.maxa, " + 
-            " datosempleado.promediot,datosempleado.mint,datosempleado.maxt,datosempleado.promedion, " + 
-            " datosempleado.minn, datosempleado.maxn, datosempleado.maxquiebres,datosempleado.domingoslibres " + 
+            return "SELECT datoshistoricos.rut,datosempleado.diastrabajados,datosempleado.diasdescansados, " + 
+            "datosempleado.maxnoches,datosempleado.librespostsaliente,datosempleado.finesdesemanalibres " +   
             "FROM datosEmpleado,datosHistoricos, empleados " + 
-            "WHERE empleados.rut = datoshistoricos.empleados_rut AND " + 
-            " empleados.cargos_id = '"+cargoId+"' AND datoshistoricos.id_datos =datosempleado.id_datos";
+            "WHERE empleados.rut = datoshistoricos.rut AND " + 
+            " empleados.idcargo = '"+cargoId+"' AND datoshistoricos.iddatos =datosempleado.iddatos";
         case 7:
             return "SELECT empleados.rut,vacaciones.fechainicio,vacaciones.fechatermino " + 
-            "FROM empleados, vacaciones " + 
-            "WHERE empleados.rut = vacaciones.empleados_rut";
+            "FROM empleados, vacaciones  " + 
+            "WHERE empleados.rut = vacaciones.rut AND  " + 
+            "empleados.idCargo='"+cargoId+"'";
         }
         return "lol";
     }

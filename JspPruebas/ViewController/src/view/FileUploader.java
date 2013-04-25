@@ -5,12 +5,14 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+
+import java.util.Calendar;
 import java.util.StringTokenizer;
 
 
@@ -156,8 +158,8 @@ public class FileUploader {
                     if(actualLine.startsWith("#") || actualLine.startsWith(";"))
                             continue;
                     separator = new StringTokenizer(actualLine,";");
-                    dataRow = new String[columns];
-                    for(int i=0;i<columns;i++){
+                    dataRow = new String[separator.countTokens()];
+                    for(int i=0;i<dataRow.length;i++){
                         try{
                             dataRow[i] = separator.nextToken();
                             //System.out.print(dataRow[i]+"\t");
@@ -170,6 +172,9 @@ public class FileUploader {
                     //System.out.println("");
                     
                     saveRecord(SQL,colTypes,dataRow);
+                    if(tableName.equals("Empleados"))
+                        createHistoricRecord(dataRow,con);
+                        
             }
             } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -230,7 +235,7 @@ public class FileUploader {
 		
 		try {
 			//Dependiendo del caso, indicamos que tipo de datos setear
-			for(int i=0; i<dataRow.length;i++){
+			for(int i=0; i<colTypes.length;i++){
 				if(colTypes[i].equals("int"))
 					SQL.setInt(i+1, Integer.parseInt(dataRow[i]));
 				else if(colTypes[i].equals("date")){
@@ -249,5 +254,35 @@ public class FileUploader {
 			e.printStackTrace();
 		}		
 	}
+
+    private void createHistoricRecord(String[] empData, Connection con) {
+        //Crea un registro historico por defecto, de acuerdo al tipo de contrato del empleado
+        PreparedStatement st;
+
+        try {
+            st = con.prepareStatement("insert into datosHistoricos values (?,?,?,?,?,?)");
+            st.setString(1, empData[0]);
+            int typeContract= Integer.parseInt(empData[4]);
+            st.setInt(2, typeContract);
+            st.setInt(3,0);
+            st.setInt(4,0);
+        
+            java.util.Date today = new java.util.Date();             
+            Calendar calendar = Calendar.getInstance();  
+            calendar.setTime(today);  
+            calendar.set(Calendar.DAY_OF_MONTH, 1);  
+            java.util.Date firstDayOfMonth = calendar.getTime();  
+            st.setDate(5, new Date(firstDayOfMonth.getTime()));
+            st.setInt(6, 1);
+            
+            st.executeUpdate();
+            st.close();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+
+    }
 }
 
