@@ -46,12 +46,12 @@ public class FileGenerator extends HttpServlet {
             String folderName="C:\\"+idCargo;
             new File(folderName).mkdir();
             //Carga de clases auxiliares:
-            DbManager dbmg = new DbManager("dev","dev","xe");
+            DbManager dbmg = new DbManager("dev","dev","orcl");
             
             /*Aqui, en una ciclo o algo, se debe iterar para crear los
              * 12 archivos necesarios:
              * */
-            for(int i =7; i<=7;i++){
+            for(int i =2; i<=7;i++){
                 String fileName = getNextFileName(i);
                 ResultSet table = null;
                 CSVWriter writer = new CSVWriter(new FileWriter(folderName+"\\"+fileName+".csv"),';',' ');
@@ -236,7 +236,7 @@ public class FileGenerator extends HttpServlet {
                 while( !start.after(end)){
                     Date targetDay = start.getTime();
                     // Do Work Here
-                    dayWeek=sdf.format(start);
+                    dayWeek=sdf.format(start.getTime());
                     habil= -1;
                     if(dayWeek.equals("Mon") || dayWeek.equals("Tue") || dayWeek.equals("Wed")
                         || dayWeek.equals("Thu") || dayWeek.equals("Fri"))
@@ -244,22 +244,66 @@ public class FileGenerator extends HttpServlet {
                     else
                         habil=0;
                     String[] nextRow = {table.getString(1),
-                                        dia.format(start),
+                                        dia.format(start.getTime()),
                                         ""+habil};
                     writer.writeNext(nextRow);
                     start.add(Calendar.DATE, 1);
                 }
-
+            writer.close();
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
  
     }
 
-    private void postProcess3(ResultSet resultSet, CSVWriter csvWriter) {
+    private void postProcess3(ResultSet table, CSVWriter writer) {
+        //Preproceso de vacaciones
+        try {
+            while(table.next()){
+                Calendar start = Calendar.getInstance();
+                start.setTime(table.getDate(2));
+
+                Calendar end = Calendar.getInstance();
+                end.setTime(table.getDate(3));
+                //SimpleDateFormat sdf = new SimpleDateFormat("EEE",Locale.ENGLISH);
+                SimpleDateFormat dia = new SimpleDateFormat("dd");
+                int dayOfWeek,habil;
+                String dayWeek;
+                while( !start.after(end)){
+                    Date targetDay = start.getTime();
+                    // Do Work Here
+                    String[] nextRow = {table.getString(1),
+                                        dia.format(start.getTime()),
+                                        table.getString(4)};
+                    writer.writeNext(nextRow);
+                    start.add(Calendar.DATE, 1);
+                }
+
+            }
+        writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
-    private void postProcess6(ResultSet resultSet, CSVWriter csvWriter) {
+    private void postProcess6(ResultSet table, CSVWriter writer) {
+        try {
+            while(table.next()){
+                    String[] nextRow = {table.getString(1),
+                                        table.getString(2),
+                                        table.getString(3),
+                                        table.getString(4),
+                                        table.getString(5),
+                                        table.getString(6),
+                                        "0","0","0","0","0","0",
+                                        "0","0","0","0","0","0"};
+                    writer.writeNext(nextRow);    
+        }
+        writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
