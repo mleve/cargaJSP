@@ -16,12 +16,10 @@
         <style type="text/css">
             #busyContainer{
                 display:none;
-                position:absolute;
-                top:100px;
-                left:100px;
             }        
         </style>
         <script type="text/javascript">
+        mostrarSend=0;
         $(function() {
                 $('input[type="checkbox"]').ezMark(); 
                 
@@ -261,20 +259,34 @@
                     <input id="demandaSkills" type="file" name="input" />
                     <br>
                     </div>
-                    <input type="submit" onclick="showBusy()" value="enviar"/>
+                    <input type="submit" id="sendForm" style="display:none" onclick="showBusy()" value="enviar"/>
                     </form>
                 </div>
             </div>
-            <div id="busyContainer" >
+            <div id="busyContainer" class="divContainer">
                 <img src="busy2.gif" />
             </div>
        <script type="text/javascript">
         $("#checkBoxesDiv input").click(function(){
-            if($($(this).val()).css("display")=="none")
-                $($(this).val()).css("display","");
-            else
+            if($($(this).val()).css("display")=="none"){
+                    $($(this).val()).css("display","");
+                    mostrarSend=mostrarSend+1;
+                }
+            else{
                 $($(this).val()).css("display","none");
+                mostrarSend=mostrarSend-1;
+            }
         });
+        
+        $("#checkBoxesDiv input").click(function(){
+            if(mostrarSend>0){
+                document.getElementById("sendForm").style.display="block";
+            }
+            else{
+                document.getElementById("sendForm").style.display="none";
+            }
+        });
+        
         
         function showBusy(){
                 document.getElementById("busyContainer").style.display="block";
