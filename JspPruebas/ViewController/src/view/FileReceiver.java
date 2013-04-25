@@ -73,11 +73,41 @@ public class FileReceiver extends HttpServlet {
         //System.out.println(request);
  
         PrintWriter out = response.getWriter();
-        out.println("<html>");
-        out.println("<head><title>FileReceiver</title></head>");
-        out.println("<body>");
-        out.println("<p>The servlet has received a POST. This is the reply.</p>");
-        out.println("</body></html>");
+        out.println("<!DOCTYPE HTML>" +
+                    "<html>"  +
+                    "<head>" +
+                    " <title>Subida Exitosa</title> \n" + 
+                    " <META HTTP-EQUIV=\"REFRESH\" CONTENT=\"0;URL=CargaArchivos.jsp\"> \n" + 
+                    "<link href=\"resources/css/styles.css\" rel=\"stylesheet\" type=\"text/css\">\n" + 
+                    "\n" + 
+                    "<!--[if lt IE 9]>\n" + 
+                    "<script src=\"http://html5shiv.googlecode.com/svn/trunk/html5.js\"></script>\n" + 
+                    "<![endif]-->\n" + 
+                    "\n" + 
+                    "</head>\n" + 
+                    "\n" + 
+                    "<body onload='alert(\"Subida de Archivo exitosa, redirigiendo\");>\n" + 
+                    "\n" + 
+                    "<div class=\"container\">\n" + 
+                    "  <header>\n" + 
+                    "    <a href=\"menu.html\"><img src=\"resources/images/header.jpg\" alt=\"Andes Airport\" width=\"900\" height=\"90\" id=\"logo\" style=\"background: #42413C;; display:block;\" /></a>\n" + 
+                    "  </header>\n" + 
+                    "\n" + 
+                    "<div  align=\"center\" class=\"div_header\" >\n" + 
+                    "</div>\n" + 
+                    "  <br clear=\"all\"/>\n" + 
+                    "  \n" + 
+                    "  <article class=\"content\">\n" + 
+                    "    <h1>Sistema Rostering Andes</h1>    \n" + 
+                    "    <section>\n" + 
+                    "    </section>\n" + 
+                    "    <!-- end .content --></article>\n" + 
+                    "  <footer>\n" + 
+                    "    <p>sistema rostering andes v1.0</p>\n" + 
+                    "</footer>\n" + 
+                    "  <!-- end .container --></div>\n" + 
+                    "</body>\n" + 
+                    "</html>");
         out.close();
     }
 }

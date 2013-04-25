@@ -35,13 +35,10 @@
                 url: "filegenerator",
                 data: {cargo: $("#nombreCargo").val()}
                 }).done(function(){
-                    alert("volvi");
+                    alert("Generado con exito");
                 });                
             });
         </script>
-         <p>
-            <a href="menu.html">Volver</a>
-        </p>
        </article>
        <footer>
     <p>sistema rostering andes v1.0</p>
