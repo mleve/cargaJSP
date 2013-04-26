@@ -35,8 +35,9 @@ public class FileUploader {
 	 * 
 	 * */
 	public FileUploader(){}
-	
-	public void uploadFileToDb(String filename,Connection con){
+
+   @Deprecated
+    public void UploadFileToDb(String filename,Connection con){
 		FileReader fr = null;
 		BufferedReader reader = null;
 		StringTokenizer separator = null;
@@ -112,12 +113,9 @@ public class FileUploader {
 	}
         
     public void uploadFileToDb(BufferedReader reader,Connection con){
-            //FileReader fr = null;
-            //BufferedReader reader = null;
+
             StringTokenizer separator = null;
             try {
-            //fr = new FileReader(filename);                  
-            //reader = new BufferedReader(fr);
             String actualLine;
             //Nombre de la tabla:
             String tableName = reader.readLine();
@@ -129,8 +127,7 @@ public class FileUploader {
             int columns = separator.countTokens();
             String[] colNames = new String[columns];
             for(int i=0;i<columns;i++){
-                    colNames[i] = separator.nextToken();
-                    
+                    colNames[i] = separator.nextToken();               
             }
             PreparedStatement SQL = prepareSQL(con,colNames,tableName);
             //Tipos de campos:
@@ -141,20 +138,10 @@ public class FileUploader {
             for(int i=0;i<columns;i++){
                     colTypes[i] = separator.nextToken();
             }
-
-            
-            /*
-            System.out.println("nombre Tabla: "+tableName);
-            for(int i=0; i<colNames.length;i++){
-                    System.out.print(colNames[i]+"\t");
-            }
-            System.out.println("");
-            
-            */
             //Datos de la tabla
             String[] dataRow = null;                
             while ((actualLine = reader.readLine()) != null)   {
-                    //Saltarse Lineas de comentarios:
+                    //Saltarse Lineas de comentarios y vacias:
                     if(actualLine.startsWith("#") || actualLine.startsWith(";"))
                             continue;
                     separator = new StringTokenizer(actualLine,";");
@@ -162,33 +149,25 @@ public class FileUploader {
                     for(int i=0;i<dataRow.length;i++){
                         try{
                             dataRow[i] = separator.nextToken();
-                            //System.out.print(dataRow[i]+"\t");
                         } 
                         catch(Exception e){
                             //NoSuchElementException => dato vacio
                             dataRow[i] = "";    
                         }
                     }
-                    //System.out.println("");
-                    //MAXIMO 1 CURSOR!!???
-                    //PreparedStatement SQL = prepareSQL(con,colNames,tableName);
                     saveRecord(SQL,colTypes,dataRow);
-                    //SQL.close();
+                    //Agrego datos historicos por defecto
                     if(tableName.equals("Empleados"))
-                        createHistoricRecord(dataRow,con);
-                        
+                        createHistoricRecord(dataRow,con);                     
             }
             } catch (Exception e) {
-            // TODO Auto-generated catch block
             System.out.println("Error al abrir el archivo de input");
             e.printStackTrace();
             }
             try {
                     reader.close();
-                    //fr.close();
                     con.close();
             } catch (Exception e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
             }
             
@@ -197,7 +176,8 @@ public class FileUploader {
     }
 
 	private PreparedStatement prepareSQL(Connection con,String[] colNames, String tableName) {
-		// TODO Auto-generated method stub
+		/*Genera la consulta SQL insert que traspasara los datos del archivo a una tabla
+                 * */
 		String insertSQL = String.format("insert into %s (", tableName);
 		for(int i=0;i<colNames.length;i++){
 			insertSQL = insertSQL+colNames[i]+",";
@@ -210,20 +190,16 @@ public class FileUploader {
 		}
 		
 		insertSQL = insertSQL.substring(0, insertSQL.length()-1)+")";
-		//System.out.println(insertSQL);
 		PreparedStatement st= null;
 		try {
 			st = con.prepareStatement(insertSQL);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return st;
 	}
 
 	private void saveRecord(PreparedStatement SQL,String[] colTypes, String[] dataRow) {
-		// TODO Auto-generated method stub
-		
 		/*Tipos de entrada de inputs:
 		 * String
 		 * int
@@ -233,8 +209,6 @@ public class FileUploader {
 		
 		for(int i=0;i<colTypes.length;i++)
 			colTypes[i]=colTypes[i].toLowerCase();
-		
-		
 		try {
 			//Dependiendo del caso, indicamos que tipo de datos setear
 			for(int i=0; i<colTypes.length;i++){
@@ -252,14 +226,15 @@ public class FileUploader {
 			}
 			SQL.executeUpdate();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
 
     private void createHistoricRecord(String[] empData, Connection con) {
-        //Crea un registro historico por defecto, de acuerdo al tipo de contrato del empleado
+        /*Crea un registro historico por defecto, de acuerdo al tipo de contrato del empleado,
+        * Que es el ultimo dato del archivo
+        */
         PreparedStatement st;
 
         try {

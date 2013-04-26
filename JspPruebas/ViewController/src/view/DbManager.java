@@ -7,6 +7,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DbManager {
+    /*Clase para manejar la base de datos de 2 formas:
+     * 1) Iniciar con los datos de conexion, en este caso la clase guarda 
+     *    un objeto Connection y provee el metodo getTable() que retorna el resultado de un Query SQL
+     *    
+     * 2) Usar el metodo getDb para obtener un objeto Connection, que luego se puede utilizar
+     * para operar con libertad sobre la base de datos
+     */
     private Connection actualCon;
     public DbManager() {
         super();

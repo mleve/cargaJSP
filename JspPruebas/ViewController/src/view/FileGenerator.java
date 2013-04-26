@@ -46,11 +46,13 @@ public class FileGenerator extends HttpServlet {
             String folderName="C:\\"+idCargo;
             new File(folderName).mkdir();
             //Carga de clases auxiliares:
-            DbManager dbmg = new DbManager("dev","dev","orcl");
+            DbManager dbmg = new DbManager("dev","dev","xe");
+
+            /*Generador de los archivos de input del programa
+             * Si se requiere algun postProceso luego de obtener la informacion
+             * desde la base de datos, se llama a un metodo que lo realize
+             */ 
             
-            /*Aqui, en una ciclo o algo, se debe iterar para crear los
-             * 12 archivos necesarios:
-             * */
             for(int i =2; i<=7;i++){
                 String fileName = getNextFileName(i);
                 ResultSet table = null;
@@ -59,19 +61,19 @@ public class FileGenerator extends HttpServlet {
                 //Pedir una tabla en forma de ResultSet
                 table = dbmg.getTable(sql);
                 if(i==2){
-                    postProcess(table,writer,dbmg,sql);
+                    requerimientosPostProcess(table,writer,dbmg,sql);
                     continue;
                 }
                 else if(i==3){
-                    postProcess3(table,writer);
+                    capacitacionesPostProcess(table,writer);
                     continue;
                 }
                 else if(i==6){
-                    postProcess6(table,writer);
+                    empleadosPostProcess(table,writer);
                     continue;
                 }
                 else if(i==7){
-                    postProcess7(table,writer);
+                    vacacionesPostProcess(table,writer);
                     continue;
                 }
                 else{
@@ -95,7 +97,7 @@ public class FileGenerator extends HttpServlet {
     }
 
     private String getNextFileName(int i) {
-        //Hacer un switch
+        //Retorna el nombre para el archivo a generar
         switch(i){
         case 0:
             return "RequerimientosSkills";
@@ -118,20 +120,11 @@ public class FileGenerator extends HttpServlet {
     }
 
     private String getNextSqlQuery(int i,String cargoId) {
-        //Hacer un switch
+       /*Retorna un Query adecuado para retornar la informacion necesaria 
+        * para generar el archivo i
+        * */
         switch(i){
         case 0:
-            /*
-            SimpleDateFormat sp = new SimpleDateFormat("dd/MM/yy");
-            String actualDate=sp.format(Calendar.getInstance().getTime());
-            Calendar.getInstance().getTime();     
-            String minDate="01"+actualDate.substring(2);
-            int maxDay = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
-            String maxDate=""+maxDay+actualDate.substring(2);
-            return "SELECT skills_id_skill, extract(day from fecha) \"dia\",turnos_idturno, requerimiento FROM demandaskills" +
-            " WHERE cargos_='"+cargoId+"' AND fecha >= '"+minDate+"' AND fecha <= '"+maxDate+"' " +
-            "ORDER BY \"dia\" ASC";
-            */
             return "SELECT idskill,extract(day from fecha),idturno,requerimiento " + 
             "FROM demandaSkills " + 
             "WHERE idcargo='"+cargoId+"'";
@@ -171,16 +164,21 @@ public class FileGenerator extends HttpServlet {
             "WHERE empleados.rut = vacaciones.rut AND  " + 
             "empleados.idCargo='"+cargoId+"'";
         }
-        return "lol";
+        return null;
     }
 
-    private void postProcess(ResultSet table, CSVWriter writer, DbManager dbmg,String sql ) {
-        //Ajustar al dia de inicio y grabar
+    private void requerimientosPostProcess(ResultSet table, CSVWriter writer, DbManager dbmg,String sql ) {
+        /*Ajusta los dias a la convencion de 42 dias por Rostering usado en el modelo:
+         * Basicamente, se suma 6 a todos los dias de inicio. Luego se completa los 42 dias
+         * copiando los dias que corresponderian en la semana , de los ultimos registros obtenidos
+         * 
+         */ 
+        
         int rowDay =-1;
         try {
             while(table.next()){
             rowDay = table.getInt(1);
-            rowDay=rowDay+9;
+            rowDay=rowDay+6;
             String[] nextRow = {""+rowDay,
                                 ""+table.getInt(2),
                                 ""+table.getInt(3)};
@@ -189,14 +187,17 @@ public class FileGenerator extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        //Si no se alcanzan los 42 dias, copiar ...algo
+        /*Si luego de copiar el resultado, no se alcanzan los 42 dias del modelo,
+         * se completa el input copiando los dias correspondiente con los resultados
+         * de los mismos dias, pero de la ultima semana
+         */
         if(rowDay<42){
             //Recupero la misma tabla anterior
             table=dbmg.getTable(sql);
             try{
                 table.next();
                 //Avanzo al dia desde el que voy a empezar a repetir
-                while(table.getInt(1)<(rowDay-(7+9)))
+                while(table.getInt(1)<(rowDay-(7+6)))
                     table.next();
                 //Repito datos hasta completar los 42 dias
                 for(int k=rowDay;k<=42;k++){
@@ -213,15 +214,18 @@ public class FileGenerator extends HttpServlet {
                 table.close();
             }
             catch(Exception e){
-                e.printStackTrace();;
+                e.printStackTrace();
                 }
 
             }
         
     }
 
-    private void postProcess7(ResultSet table, CSVWriter writer) {
-        //Preproceso de vacaciones
+    private void vacacionesPostProcess(ResultSet table, CSVWriter writer) {
+        /*Para cada resultado de la tabla (rut, fecha inicio, fecha termino 
+         * Se escribe en el archivo 1 fila con el rut, dia (numero del mes real),
+         * hasta el ultimo dia del mes actual
+         **/
         try {
             while(table.next()){
                 Calendar start = Calendar.getInstance();
@@ -229,11 +233,19 @@ public class FileGenerator extends HttpServlet {
 
                 Calendar end = Calendar.getInstance();
                 end.setTime(table.getDate(3));
+                
+                Calendar endMonth = Calendar.getInstance();
+                endMonth.set(Calendar.MONTH, start.get(start.MONTH));
+                endMonth.set(Calendar.DAY_OF_MONTH,start.getActualMaximum(Calendar.DAY_OF_MONTH));
+                /*
+                System.out.println("hola: "+start.MONTH+" "+start.getActualMaximum(Calendar.DAY_OF_MONTH));
+                System.out.println(endMonth.getTimeInMillis());
+*/
                 SimpleDateFormat sdf = new SimpleDateFormat("EEE",Locale.ENGLISH);
                 SimpleDateFormat dia = new SimpleDateFormat("dd");
                 int dayOfWeek,habil;
                 String dayWeek;
-                while( !start.after(end)){
+                while( !start.after(end) && !start.after(endMonth)){
                     Date targetDay = start.getTime();
                     // Do Work Here
                     dayWeek=sdf.format(start.getTime());
@@ -243,8 +255,10 @@ public class FileGenerator extends HttpServlet {
                         habil=1;
                     else
                         habil=0;
+                    int modelDay = Integer.parseInt(dia.format(start.getTime()));
+                    modelDay = modelDay+7;
                     String[] nextRow = {table.getString(1),
-                                        dia.format(start.getTime()),
+                                        ""+modelDay,
                                         ""+habil};
                     writer.writeNext(nextRow);
                     start.add(Calendar.DATE, 1);
@@ -257,29 +271,34 @@ public class FileGenerator extends HttpServlet {
  
     }
 
-    private void postProcess3(ResultSet table, CSVWriter writer) {
-        //Preproceso de vacaciones
+    private void capacitacionesPostProcess(ResultSet table, CSVWriter writer) {
+        /*Para cada resultado de la tabla (rut, fecha inicio, fecha termino , turno)
+         * Se escribe en el archivo 1 fila con el rut, dia (numero del mes real) y tipo de turno (A,T,N)
+         * hasta el ultimo dia del mes actual
+         * */
         try {
             while(table.next()){
                 Calendar start = Calendar.getInstance();
                 start.setTime(table.getDate(2));
-
                 Calendar end = Calendar.getInstance();
                 end.setTime(table.getDate(3));
-                //SimpleDateFormat sdf = new SimpleDateFormat("EEE",Locale.ENGLISH);
+                
+                Calendar endMonth = Calendar.getInstance();
+                endMonth.set(Calendar.MONTH, start.get(Calendar.MONTH));
+                endMonth.set(Calendar.DAY_OF_MONTH,start.getActualMaximum(Calendar.DAY_OF_MONTH));
+                
                 SimpleDateFormat dia = new SimpleDateFormat("dd");
                 int dayOfWeek,habil;
                 String dayWeek;
-                while( !start.after(end)){
-                    Date targetDay = start.getTime();
-                    // Do Work Here
+                while( !start.after(end) && !start.after(endMonth)){
+                    int modelDay = Integer.parseInt(dia.format(start.getTime()));
+                    modelDay = modelDay+7;
                     String[] nextRow = {table.getString(1),
-                                        dia.format(start.getTime()),
+                                        ""+modelDay,
                                         table.getString(4)};
                     writer.writeNext(nextRow);
                     start.add(Calendar.DATE, 1);
                 }
-
             }
         writer.close();
         } catch (Exception e) {
@@ -288,7 +307,11 @@ public class FileGenerator extends HttpServlet {
 
     }
 
-    private void postProcess6(ResultSet table, CSVWriter writer) {
+    private void empleadosPostProcess(ResultSet table, CSVWriter writer) {
+        /*Se agrega, a los datos obtenidos de la base de datos, los 
+         * parametros necesarios del modelo, que son calculados a partir 
+         * del capacity por cargo
+         */
         try {
             while(table.next()){
                     String[] nextRow = {table.getString(1),

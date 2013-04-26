@@ -26,14 +26,7 @@ public class FileReceiver extends HttpServlet {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType(CONTENT_TYPE);
-        PrintWriter out = response.getWriter();
-        out.println("<html>");
-        out.println("<head><title>FileReceiver</title></head>");
-        out.println("<body>");
-        out.println("<p>The servlet has received a GET. This is the reply.</p>");
-        out.println("</body></html>");
-        out.close();
+
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -42,25 +35,16 @@ public class FileReceiver extends HttpServlet {
         try {
             List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
             for (FileItem item : items) {
-                if (item.isFormField()) {
-                    // Process regular form field (input type="text|radio|checkbox|etc", select, etc).
-                    String fieldname = item.getFieldName();
-                    String fieldvalue = item.getString();
-                    // ... (do your job here)
-                } else {
+                if (!item.isFormField()) {
                     // Process form file field (input type="file").
                     
-                    String fieldname = item.getFieldName();
-                    //String filename = FilenameUtils.getName(item.getName());
+                    /*Se Genera un BufferedReader a partir de cada archivo subido,
+                     *luego uploader lo guarda en la base de datos
+                     * */
                     InputStream filecontent = item.getInputStream();
-                   
-                    // ... (do your job here)
                     InputStreamReader fileAux = new InputStreamReader(filecontent);
                     if(fileAux.ready()){
                     BufferedReader bf = new BufferedReader(fileAux);
-                    //System.out.println(bf.readLine());
-                    
-                    //System.out.println(fieldname);
                     FileUploader uploader = new FileUploader();
                     Connection con = new DbManager().getDb("dev","dev","orcl");
                     uploader.uploadFileToDb(bf, con);
